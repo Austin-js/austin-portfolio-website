@@ -103,5 +103,13 @@
       sections.forEach(sec => observer.observe(sec));
     });
   </script>
+<script>
+  window.addEventListener('load', function() {
+    const loader = document.getElementById('loading-screen');
+    loader.classList.add('loaded');
+    // Optional: completely remove it after fade:
+    setTimeout(() => loader.remove(), 500);
+  });
+</script>
 </body>
 </html>

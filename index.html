@@ -14,7 +14,7 @@
   <div id="loading-screen">
     <div class="spinner"></div>
   </div>
-  
+
   <header>
     <nav>
       <a href="index.html" class="nav-logo">
@@ -139,6 +139,14 @@
       // hide the button
       btn.style.display = 'none';
     });
+  });
+</script>
+<script>
+  window.addEventListener('load', function() {
+    const loader = document.getElementById('loading-screen');
+    loader.classList.add('loaded');
+    // Optional: completely remove it after fade:
+    setTimeout(() => loader.remove(), 500);
   });
 </script>
 </body>
