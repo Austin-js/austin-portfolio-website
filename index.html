@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Austin John Salvador – Portfolio</title>
+  <link rel="icon" href="images/logo.png" type="image/png" />
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="images/logo.png" alt="Site Logo" />
+      </a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+<!--        <li><a href="projects.html">Projects</a></li>-->
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Subtle glows on the sides -->
+  <div class="glow glow-left"></div>
+  <div class="glow glow-right"></div>
+
+  <main>
+    <section class="intro-container">
+      <!-- Left: Hero content -->
+      <div class="intro-left">
+        <h1><span class="nowrap">Austin John</span><br>Salvador</h1>
+        <p class="description">
+          Passionate about building clean, scalable backends and automation systems.
+        </p>
+        <p class="sub-tagline">Let’s build your system today!</p>
+        <a href="#projects" class="btn">See My Works</a>
+      </div>
+
+      <!-- Right: Profile + social -->
+      <div class="intro-right">
+        <div class="profile-container">
+          <img src="images/photo.jpg" alt="Austin John Salvador" class="profile-large" />
+          <div class="profile-shadow"></div>
+        </div>
+        <div class="social-links">
+          <a href="https://github.com/Austin-js" target="_blank" aria-label="GitHub">
+            <img src="images/github-icon.svg" alt="GitHub" />
+          </a>
+          <a href="https://www.linkedin.com/in/austin-john-s/" target="_blank" aria-label="LinkedIn">
+            <img src="images/linkedin-icon.svg" alt="LinkedIn" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Projects -->
+    <section id="projects" class="projects-grid">
+      <h2>Featured Projects</h2>
+      <div id="featured-projects" class="grid-container">
+
+        <div class="project-card">
+          <img src="images/projects/liquidity-sniper-bot.webp" alt="Liquidity Sniper Bot">
+          <h3>Uniswap/PancakeSwap (Ethereum Blockchain) Liquidity Sniper Bot</h3>
+          <p>This is a bot for the Ethereum blockchain that allows to buy a token during launch as soon as liquidity is detected or if swapping is enabled.</p>
+          <p><a href="https://www.upwork.com/services/product/development-it-uniswap-pancakeswap-ethereum-blockchain-liquidity-sniper-bot-1735871817301458944?ref=project_share" target="_blank">View on Upwork</a></p>
+        </div>
+
+        <div class="project-card">
+          <img src="images/projects/volume-bot.webp" alt="Uniswap Pancakeswap volume bot">
+          <h3>Ethereum Blockchain Volume Bot (Market Maker)</h3>
+          <p>Increase your token's volume by using this tool that allows you to automatically create buy and sell transactions for a period of time.</p>
+          <p><a href="https://www.upwork.com/services/product/development-it-ethereum-blockchain-volume-bot-market-maker-1735874227995877376?ref=project_share" target="_blank">View on Upwork</a></p>
+        </div>
+
+        <div class="project-card">
+          <img src="images/projects/wallet-generator.webp" alt="Ethereum Wallet Generator">
+          <h3>Ethereum Blockchain Wallet Generator</h3>
+          <p>This bot allows you to generate as many wallets as you can. It is also equipped with functions that allows you to send funds to and from the generated wallets.</p>
+          <p><a href="https://www.upwork.com/services/product/development-it-ethereum-blockchain-wallet-generator-1735875893846855680?ref=project_share" target="_blank">View on Upwork</a></p>
+        </div>
+
+        <div class="project-card">
+          <img src="images/projects/chat-bot-demo.png" alt="Business Chatbot demo">
+          <h3>Facebook Page AI Chatbot</h3>
+          <p>Can help with your customer inquiries, data collection, and even bookings or orders!</p>
+          <p><a href="" target="_blank">(Work in progress)</a></p>
+        </div>
+
+      </div>
+      <button id="show-more-btn" class="btn btn-outline">See More Projects</button>
+    </section>
+  </main>
+
+  <footer>© 2025 Austin John Salvador</footer>
+
+  <!-- IntersectionObserver for scroll animations -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.project-card');
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      cards.forEach(card => observer.observe(card));
+
+      // Glow parallax
+      const speed = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--drift-speed'));
+      const leftGlow = document.querySelector('.glow-left');
+      const rightGlow = document.querySelector('.glow-right');
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        leftGlow.style.transform = `translateY(${y * speed}px)`;
+        rightGlow.style.transform = `translateY(${-y * speed}px)`;
+      });
+    });
+  </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('featured-projects');
+    const btn  = document.getElementById('show-more-btn');
+
+    btn.addEventListener('click', () => {
+      // reveal all cards
+      grid.classList.add('show-all');
+      // hide the button
+      btn.style.display = 'none';
+    });
+  });
+</script>
+</body>
+</html>

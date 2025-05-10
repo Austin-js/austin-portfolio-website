@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About – Austin John Salvador</title>
+  <link rel="icon" href="images/logo.png" type="image/png" />
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="images/logo.png" alt="Logo" />
+      </a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+<!--        <li><a href="projects.html">Projects</a></li>-->
+        <li><a href="about.html" class="active">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="about-container">
+    <!-- Section: Introduction -->
+    <section class="about-section-left">
+      <img src="images/about-5.jpg" alt="About photo" class="about-img" />
+      <div>
+        <h2>Hi there!</h2>
+        <p><br>
+          My name is Austin. I'm a self-learned developer and I love automating and building systems that make life easier.<br><br>(and more fun!)
+        </p>
+      </div>
+    </section>
+
+    <!-- Section: My Experiences -->
+    <section class="about-section-right">
+      <div>
+        <h2>My Experiences</h2>
+        <p>
+          <br>
+          Has 3+ years of experience mainly as a Python/Backend Developer.
+          Worked on Web3 Ethereum bots, Flask based web systems and apps, and customized AI chatbots for businesses.
+          <br><br>
+          I formerly go by the developer name "Austin_js" when I started on Fiverr.
+          Eventually, I stopped freelancing on Fiverr when they restricted crypto-related services similar to my previous projects.
+        </p>
+      </div>
+      <img src="images/about-2.jpeg" alt="Journey photo" class="about-img" />
+    </section>
+
+    <!-- Section: Skills & Interests -->
+    <section class="about-section-left">
+      <img src="images/about-4.jpg" alt="Skills photo" class="about-img" />
+      <div>
+        <h2>My Story</h2>
+        <p>
+          <br>
+          I did not actually graduate from any computer science related course, and it was actually one of my regrets.
+          Since I was a kid, I have always loved tinkering and creating scripts with my computer back then!
+          <br><br>
+          During the pandemic, I first took interest of Forex and crypto trading to try and make money. It was then I realized I could make scripts to automate our trading strategies.
+          <br><br>
+          I learned MQL4 and MQL5 to create our first original trading bots with my friends. We shared and sold it to other people, and it was a bit successful in the short term.
+          We stopped because the bot was not entirely perfect. We didn't like the risk being given to our clients.
+          <br><br>
+          Eventually, I transitioned to trading cryptocurrency and I learned about the Ethereum blockchain. I found out I can automate transactions using Python and Web3.
+          I developed bots that can snipe tokens during their launch. I started being a Freelancer on Fiverr and sold my services there.
+          <br><br>
+          For 2 years, I was working as a freelancer - being able to work with many clients. My work was mostly about automating transactions on the Ethereum blockchain.
+          During this time, I learned a lot with my experiences on Python, took several different Python and CS courses, and did side projects to improve my skills.
+          I was playing around with AI around this time too (regarding photo generation and chatbots).
+          However, I had to stop freelancing on Fiverr when they restricted crypto-related services similar to my previous projects.
+          <br><br>
+          I transitioned by looking for a remote full-time job, and I was able to get a job as a Python/Backend Developer.
+          On the side, I am also working on my own projects related to AI that would help businesses.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 Austin John Salvador</footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('.about-section-left, .about-section-right');
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      sections.forEach(sec => observer.observe(sec));
+    });
+  </script>
+</body>
+</html>
