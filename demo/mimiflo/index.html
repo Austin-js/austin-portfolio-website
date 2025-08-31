@@ -73,6 +73,7 @@
     grid-auto-flow:column;
     grid-auto-columns:100%;
     height:100%;
+    gap:0;                 /* ← add */
     transition:transform .4s ease;
     will-change:transform;
   }
@@ -118,7 +119,27 @@
     .section h2{font-size:1.05rem;margin:.15rem 0 .55rem}
 
     /* Horizontal scroller for Featured/New */
-    .row{ display:grid;grid-auto-flow:column;grid-auto-columns:70%;gap:.6rem;overflow:auto;scroll-snap-type:x mandatory;padding-bottom:.15rem; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+    .row{
+      display:grid;
+      grid-auto-flow:column;
+      grid-auto-columns:70%;
+      gap:.6rem;overflow:auto;
+      scroll-snap-type:x mandatory;
+      padding-bottom:.15rem;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+      overflow-y: hidden; /* you already had this, keep it */
+      overscroll-behavior-x: contain;  /* prevent sideways page pan */
+      overscroll-behavior-y: auto;     /* allow vertical page scroll */
+    }
+    .row .card{
+      overscroll-behavior-y: auto;
+      touch-action: auto;
+    }
+    .row img, .row a{
+      -webkit-user-drag: none;
+      user-select: none;
+    }
     @media(min-width:640px){.row{grid-auto-columns:33%}}
     @media(min-width:900px){.row{grid-auto-columns:25%}}
 
@@ -126,7 +147,7 @@
     .grid{display:grid;gap:.6rem;grid-template-columns:1fr 1fr}
     @media(min-width:760px){.grid{grid-template-columns:repeat(3,1fr)}}
     @media(min-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
-    .grid, .card{
+    .grid .card{
       touch-action: pan-y;  /* ← vertical scroll passes through */
     }
     .row, .chips, .slideshow{
@@ -172,46 +193,79 @@
     .close-x{ position:absolute;right:.6rem;top:.6rem;border:0;background:#fff;border:1px solid #dbe8ff;border-radius:999px;padding:.3rem .5rem;font-weight:800 }
 
     /* Product Modal */
-    .modal{ position:fixed;inset:0;z-index:90;display:none; }
-    .modal.open{ display:block; }
-    .modal .overlay{ position:absolute;inset:0;background:rgba(0,0,0,.45); opacity:0;transition:opacity .5s ease;}
+    .modal{
+      position:fixed; inset:0; z-index:1000;
+      opacity:0; visibility:hidden; pointer-events:none;
+    }
+    .modal.open{
+      opacity:1; visibility:visible; pointer-events:auto;
+    }
+    .modal .overlay{
+      position:absolute; inset:0; background:rgba(0,0,0,.45); z-index:0; opacity:0; transition:opacity .5s ease;
+    }
+    .modal.open .overlay{ opacity:1; }
     .modal .panel{
       position:absolute; left:50%; top:50%;
-      width:min(95%, 980px); background:#fff; border-radius:16px; box-shadow:var(--shadow); overflow:hidden; border:1px solid #e6efff;
-      display:grid; grid-template-columns:1fr; gap:0; padding:0;
+      width:min(95vw, 980px);
+      max-height:90vh;
+      background:#fff;                     /* ← the missing bit */
+      border:1px solid #e6efff;
+      border-radius:16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.12);
+      overflow: auto;          /* was hidden; lets long content scroll inside */
+      -webkit-overflow-scrolling: touch;
       opacity:0;
-      transform:translate(-50%, calc(-50% + 12px)) scale(.985);
       transition:opacity .5s ease, transform .5s ease;
       will-change:opacity, transform;
+      display:grid;
+      grid-template-columns:1fr; /* mobile: stack */
+      z-index:1;                 /* above overlay */
+      backface-visibility: hidden;
+      transform: translateZ(0) translate(-50%, calc(-50% + 12px)) scale(.985);
     }
     .modal.open .panel{
-    opacity:1;
-    transform:translate(-50%, -50%) scale(1);
+      opacity:1;
+      transform:translate(-50%, -50%) scale(1);
     }
     .modal .close-abs{
       position:absolute; top:10px; right:10px; z-index:2;
       border:0;background:#fff;border:1px solid #dbe8ff;border-radius:999px;padding:.32rem .5rem;font-weight:800; cursor:pointer;
     }
-    .modal .content{ display:grid; grid-template-columns:1fr; gap:0; }
-    .modal .media{ background:#f6f9ff; display:grid; place-items:center; }
-    .modal .media img{ max-width:100%; max-height:60vh; width:auto; height:auto; object-fit:contain; }
+    .modal .content{
+      display:grid;
+      grid-template-columns:1fr; /* mobile */
+    }
+    .modal .media{
+      background:#f6f9ff;
+      display:grid; place-items:center;
+      border-right:0;
+    }
+    .modal .media img{
+      max-width:100%; max-height:60vh;
+      width:auto; height:auto;
+      object-fit:contain; object-position:center;
+    }
 
-    .modal .modal-right{ display:flex; flex-direction:column; justify-content:space-between; padding:1rem; margin:auto; }
-    .modal .details{ display:grid; gap:.35rem; }
+    .modal .modal-right{
+      display:flex; flex-direction:column;
+      justify-content:space-between;
+      padding:1rem;
+      margin:auto;
+    }
+    .modal .details{ display:grid; gap:.35rem; margin-bottom: 4rem;}
     .modal-title{ font-size:1.22rem; font-weight:800; line-height:1.25; margin:0; }
-    .modal-price{ font-weight:800; font-size:1.02rem; margin:0; }
+    .modal-price{ font-weight:600;font-size:.95rem; margin:0; }
     .modal-desc{ color:var(--muted); font-size:.95rem; margin:0; }
     .content-buttons{ margin-top:.3rem; }
     .action-row{ display:flex; gap:.45rem; flex-wrap:wrap; }
     .action-row .pill{ font-size:.8rem; padding:.32rem .55rem; } /* smaller buttons */
 
-    @media(min-width:720px){
+    @media (min-width:720px){
       .modal .content{ grid-template-columns:1.1fr 1fr; }
       .modal .media{ border-right:1px solid #eef3ff; }
       .modal .media img{ max-height:520px; }
       .modal-title{ font-size:1.3rem; }
       .modal-price{ font-size:1.1rem; }
-      .modal .overlay, .modal .panel{ transition:none !important; }
     }
 
     /* Footer */
@@ -468,7 +522,7 @@
   }
 
   function initSlideshow(){
-    const slider   = document.getElementById("slideshow");   // NEW
+    const slider   = document.getElementById("slideshow");
     const slidesEl = document.getElementById("slides");
     const dotsEl   = document.getElementById("dots");
     let idx = 0, timer;
@@ -479,9 +533,10 @@
 
     // NEW: pixel-based translate to avoid right-side cutoffs
     const applyTransform = ()=>{
-      const w = Math.round(slider.getBoundingClientRect().width);
+      const w = Math.floor(slider.clientWidth);
       slidesEl.style.transform = `translate3d(-${idx * w}px, 0, 0)`;
     };
+    new ResizeObserver(applyTransform).observe(slider);
     window.addEventListener("orientationchange", ()=> setTimeout(applyTransform, 0));
 
     const go = (i)=>{
