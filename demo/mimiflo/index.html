@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mimiflo — Baby Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#85BDF9" />
+  <style>
+    :root{
+      --brand:#85BDF9; --brand-600:#5aa6f6; --ink:#1f2937; --muted:#6b7280;
+      --bg:#ffffff; --card:#ffffff; --chip:#eef5ff;
+      --ring: 2px solid rgba(90,166,246,.45);
+      --radius: 16px; --radius-sm: 12px; --shadow: 0 8px 30px rgba(0,0,0,.06);
+      --fs-title: 0.95rem; --fs-meta: 0.82rem; --fs-badge: 0.72rem; --fs-chip: 0.88rem; --fs-btn: 0.88rem;
+      --pad-card: .6rem; --pad-btn-v: .4rem; --pad-btn-h: .6rem; --thumb-radius: 12px;
+      --gutter: clamp(12px, 4vw, 20px);
+      --gutter-left:  max(var(--gutter), env(safe-area-inset-left));
+      --gutter-right: max(var(--gutter), env(safe-area-inset-right));
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;background:var(--bg);color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+      width:100%;max-width:100%;
+      overflow-x:hidden; /* ✅ prevent page from panning sideways */
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* Header */
+    .topbar{ position:sticky;top:0;z-index:70; background:linear-gradient(180deg,var(--brand),#a8d0ff); color:#0b2542; box-shadow:0 1px 0 rgba(255,255,255,.25);}
+    .topbar-inner{ display:flex;align-items:center;gap:.6rem; padding:.6rem 1.25rem; max-width:1100px;margin:0 auto;padding-block: .6rem;padding-inline: var(--gutter-left) var(--gutter-right);}
+    .brand{ display:flex;align-items:center;gap:.45rem; }
+    .brand img{
+      width:70px;height:70px; /* ~1/3 smaller */
+      object-fit:contain;border-radius:10px;background:transparent;border:0;box-shadow:none;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,.08));
+    }
+    .nav-spacer{flex:1}
+    .nav-cta{position:relative}
+    .btn{
+      border:0;border-radius:999px;padding:var(--pad-btn-v) var(--pad-btn-h);font-weight:700;font-size:var(--fs-btn);
+      background:#fff;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:.45rem;
+      border:1px solid #dbe8ff;white-space:nowrap
+    }
+    .btn:focus-visible{outline:var(--ring)}
+    .btn-icon{ width:42px;height:42px;display:grid;place-items:center;padding:0;font-size:1.1rem; }
+
+    /* Dropdown menu */
+    .menu-panel{
+      position:absolute;right:0;top:calc(100% + 6px);
+      background:#fff;border:1px solid #dbe8ff;border-radius:12px;box-shadow:var(--shadow);
+      padding:.4rem;display:none;min-width:180px;z-index:80;
+    }
+    .menu-panel.open{display:block}
+    .menu-panel a{ display:block;padding:.5rem .6rem;border-radius:8px;font-weight:600;font-size:.92rem; }
+    .menu-panel a:hover{background:#eef5ff}
+
+    /* Hero / search */
+    .hero{ background:linear-gradient(180deg,#eaf4ff,transparent); padding:.8rem .9rem 0rem; overflow-x:hidden;  padding-block-start:.8rem;padding-block-end:0;padding-inline: var(--gutter-left) var(--gutter-right);}
+    .hero-inner{ max-width:1100px;margin:0 auto;display:grid;gap:.8rem; }
+
+  .slideshow{
+    position:relative;
+    border-radius:16px; overflow:hidden;
+    border:1px solid #dbe8ff; box-shadow:var(--shadow);
+    background:#fff;
+    aspect-ratio:1080 / 608;   /* ← fixed ratio */
+    /* remove any min-height you had before */
+  }
+  .slides{
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns:100%;
+    height:100%;
+    transition:transform .4s ease;
+    will-change:transform;
+  }
+
+  .slide{
+    width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:#f2f7ff;
+  }
+  .slide img{
+    width:100%; height:100%;
+    object-fit:cover;           /* ← fills 1080×608 frame */
+    object-position:center;     /* ← keeps subject centered */
+  }
+    .slide-nav{
+      position:absolute;top:50%;transform:translateY(-50%);border:0;background:rgba(255,255,255,.9);
+      width:34px;height:34px;border-radius:999px;display:grid;place-items:center;font-weight:800;cursor:pointer;
+      border:1px solid #dbe8ff;
+    }
+    .slide-nav:hover{background:#fff}
+    .slide-nav.prev{left:.5rem}
+    .slide-nav.next{right:.5rem}
+    .dots{ position:absolute;left:0;right:0;bottom:.4rem;display:flex;gap:.35rem;justify-content:center }
+    .dot{ width:8px;height:8px;border-radius:999px;background:#c9dcff;border:1px solid #a9c7ff }
+    .dot.active{background:#5aa6f6;border-color:#368cf1}
+
+    .toolbar{ display:grid;gap:.5rem;grid-template-columns:1fr;margin:.2rem 0 .8rem; }
+    .search{ display:flex;align-items:center;gap:.45rem; background:#fff;border:1px solid #dbe8ff;border-radius:999px;padding:.45rem .6rem; box-shadow:var(--shadow); width:100%; min-width:0; }
+    .search input{ flex:1;border:0;outline:none;font-size:.95rem;background:transparent;padding:.3rem; min-width:0;}
+    .search input:focus{outline:var(--ring)}
+    .kebab{font-size:1.1rem}
+
+    /* Category chips */
+    .chips{display:flex;gap:.45rem;overflow:auto;padding-bottom:.35rem; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+    .chip{ white-space:nowrap;background:var(--chip);border:1px solid #dbe8ff;color:#0b2542; border-radius:999px;padding:.38rem .65rem;font-weight:600;font-size:var(--fs-chip);opacity:.95 }
+    .chip.active{background:var(--brand);color:#0b2542;border-color:transparent}
+    .chip:focus-visible{outline:var(--ring)}
+    .metrics{font-size:.8rem;color:var(--muted);margin:.1rem 0 0}
+
+    /* Sections */
+    .section{padding:.8rem .9rem; overflow-x:hidden; padding-block:.8rem;padding-inline: var(--gutter-left) var(--gutter-right);}
+    .section-inner{max-width:1100px;margin:0 auto}
+    .section h2{font-size:1.05rem;margin:.15rem 0 .55rem}
+
+    /* Horizontal scroller for Featured/New */
+    .row{ display:grid;grid-auto-flow:column;grid-auto-columns:70%;gap:.6rem;overflow:auto;scroll-snap-type:x mandatory;padding-bottom:.15rem; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+    @media(min-width:640px){.row{grid-auto-columns:33%}}
+    @media(min-width:900px){.row{grid-auto-columns:25%}}
+
+    /* Grid for “All Products” */
+    .grid{display:grid;gap:.6rem;grid-template-columns:1fr 1fr}
+    @media(min-width:760px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
+    .grid, .card{
+      touch-action: pan-y;  /* ← vertical scroll passes through */
+    }
+    .row, .chips, .slideshow{
+      overscroll-behavior-x: contain;  /* prevent sideways “page” pan */
+      overscroll-behavior-y: auto;     /* allow vertical scroll */
+    }
+
+    /* Product card */
+    .card{ background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow); border:1px solid #e6efff;overflow:hidden;display:flex;flex-direction:column;scroll-snap-align:start; cursor:pointer;}
+    .thumb{ aspect-ratio:1/1;background:linear-gradient(135deg,#f3f8ff,#e6f1ff); display:grid;place-items:center;position:relative;border-bottom:1px solid #eaf1ff; }
+    .thumb img{ width:100%; height:100%; object-fit:cover; }
+    .thumb .ph{ width:52%;height:52%;border-radius:var(--thumb-radius);border:2px dashed #cde0ff;background:#fff;color:#7aaef7; display:grid;place-items:center;font-weight:700;font-size:.9rem }
+    .badges{ position:absolute;top:.5rem;left:.5rem;display:flex;gap:.35rem }
+    .badge{ background:#fff;border:1px solid #dbe8ff;color:#0b2542; padding:.2rem .45rem;border-radius:999px;font-size:var(--fs-badge);font-weight:800 }
+    .badge.new{background:#0ea5e9;color:#fff;border-color:transparent}
+    .body{display:flex;flex-direction:column;gap:.25rem;padding:var(--pad-card)}
+    .title{font-weight:800;line-height:1.25;font-size:var(--fs-title)}
+    .price{font-weight:800;font-size:.95rem}
+    .cta{display:flex;gap:.4rem;margin-top:.25rem;flex-wrap:wrap}
+    .pill{ display:inline-flex;align-items:center;gap:.35rem; background:#f7fbff;border:1px solid #dbe8ff;border-radius:999px;padding:.35rem .55rem;font-weight:700;font-size:.82rem }
+    .pill:hover{background:#eef5ff}
+    .pill.shopee{background:#fff7f0;border-color:#ffd8b5}
+    .pill.lazada{background:#fff6ff;border-color:#f4d7ff}
+    .count{margin-left:auto;color:var(--muted);font-size:.82rem}
+    .title{
+      color:#368cf1;     /* or use var(--brand-600) */
+      font-weight:800;   /* keep or adjust; your call */
+    }
+    .price{
+      font-weight:400;   /* ← not bold */
+      color:#334155;     /* slate-ish for contrast */
+    }
+
+    /* Category Drawer */
+    .drawer{ position:fixed;inset:0;z-index:60;display:none; }
+    .drawer.active{display:block}
+    .drawer .overlay{ position:absolute;inset:0;background:rgba(0,0,0,.35) }
+    .drawer .panel{ position:absolute;left:0;top:0;bottom:0;width:min(86%,360px); background:#ffffff;border-right:1px solid #e6efff;box-shadow:var(--shadow);padding:1rem;overflow:auto }
+    .drawer h3{margin:0 0 .6rem}
+    .cat-list{display:grid;gap:.3rem}
+    .cat-item{ display:flex;justify-content:space-between;align-items:center; padding:.55rem .65rem;border-radius:12px;background:#f7fbff;border:1px solid #dbe8ff;font-weight:600;font-size:.92rem }
+    .cat-item:hover{background:#eef5ff}
+    .close-x{ position:absolute;right:.6rem;top:.6rem;border:0;background:#fff;border:1px solid #dbe8ff;border-radius:999px;padding:.3rem .5rem;font-weight:800 }
+
+    /* Product Modal */
+    .modal{ position:fixed;inset:0;z-index:90;display:none; }
+    .modal.open{ display:block; }
+    .modal .overlay{ position:absolute;inset:0;background:rgba(0,0,0,.45); opacity:0;transition:opacity .5s ease;}
+    .modal .panel{
+      position:absolute; left:50%; top:50%;
+      width:min(95%, 980px); background:#fff; border-radius:16px; box-shadow:var(--shadow); overflow:hidden; border:1px solid #e6efff;
+      display:grid; grid-template-columns:1fr; gap:0; padding:0;
+      opacity:0;
+      transform:translate(-50%, calc(-50% + 12px)) scale(.985);
+      transition:opacity .5s ease, transform .5s ease;
+      will-change:opacity, transform;
+    }
+    .modal.open .panel{
+    opacity:1;
+    transform:translate(-50%, -50%) scale(1);
+    }
+    .modal .close-abs{
+      position:absolute; top:10px; right:10px; z-index:2;
+      border:0;background:#fff;border:1px solid #dbe8ff;border-radius:999px;padding:.32rem .5rem;font-weight:800; cursor:pointer;
+    }
+    .modal .content{ display:grid; grid-template-columns:1fr; gap:0; }
+    .modal .media{ background:#f6f9ff; display:grid; place-items:center; }
+    .modal .media img{ max-width:100%; max-height:60vh; width:auto; height:auto; object-fit:contain; }
+
+    .modal .modal-right{ display:flex; flex-direction:column; justify-content:space-between; padding:1rem; margin:auto; }
+    .modal .details{ display:grid; gap:.35rem; }
+    .modal-title{ font-size:1.22rem; font-weight:800; line-height:1.25; margin:0; }
+    .modal-price{ font-weight:800; font-size:1.02rem; margin:0; }
+    .modal-desc{ color:var(--muted); font-size:.95rem; margin:0; }
+    .content-buttons{ margin-top:.3rem; }
+    .action-row{ display:flex; gap:.45rem; flex-wrap:wrap; }
+    .action-row .pill{ font-size:.8rem; padding:.32rem .55rem; } /* smaller buttons */
+
+    @media(min-width:720px){
+      .modal .content{ grid-template-columns:1.1fr 1fr; }
+      .modal .media{ border-right:1px solid #eef3ff; }
+      .modal .media img{ max-height:520px; }
+      .modal-title{ font-size:1.3rem; }
+      .modal-price{ font-size:1.1rem; }
+      .modal .overlay, .modal .panel{ transition:none !important; }
+    }
+
+    /* Footer */
+    footer{padding:1.4rem .9rem;color:var(--muted);border-top:1px solid #e8f0ff;text-align:center}
+
+    /* Tablet/Desktop upsizing */
+    @media(min-width:640px){
+      :root{ --fs-title: 1rem; --fs-meta: 0.86rem; --fs-chip: 0.92rem; --fs-btn: 0.95rem; --pad-card: .7rem; }
+      .brand img{ width:75px; height:75px; }
+      .slideshow{ aspect-ratio:16/9; min-height:380px; }
+    }
+    @media(min-width:1024px){
+      .slideshow{ aspect-ratio:21/9; min-height:440px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Mimiflo">
+        <img src="/images/demo/mimiflo-logo.avif" alt="Mimiflo" />
+      </div>
+
+      <div class="nav-spacer"></div>
+
+      <!-- Hamburger menu -->
+      <div class="nav-cta">
+        <button id="pagesBtn" class="btn btn-icon" type="button" aria-label="Open menu" aria-haspopup="true" aria-expanded="false">☰</button>
+        <div id="pagesMenu" class="menu-panel" role="menu" aria-label="More">
+          <a href="#" role="menuitem">Products</a>
+          <a href="#" role="menuitem">Stores</a>
+          <a href="#" role="menuitem">Videos</a>
+          <a href="#" role="menuitem">About</a>
+          <a href="#" role="menuitem">FAQ</a>
+          <a href="#" role="menuitem">Contact</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero with slideshow + search + categories -->
+  <section class="hero">
+    <div class="hero-inner">
+
+      <!-- Slideshow -->
+      <div class="slideshow" id="slideshow" aria-label="Promotions">
+        <div class="slides" id="slides"></div>
+        <button class="slide-nav prev" id="prevBtn" aria-label="Previous">‹</button>
+        <button class="slide-nav next" id="nextBtn" aria-label="Next">›</button>
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <div class="toolbar" role="search">
+        <label class="search" aria-label="Search products">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#0b2542" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input id="search" type="search" placeholder="Search products…" autocomplete="off" />
+          <button id="openCategories" class="btn" type="button" aria-haspopup="dialog">
+            <span>Browse categories</span>
+            <span class="kebab">▾</span>
+          </button>
+        </label>
+
+        <div id="chips" class="chips" aria-label="Quick categories"></div>
+        <div class="metrics"><span id="matchCount">0</span> products shown</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured -->
+  <section class="section" id="featuredSection">
+    <div class="section-inner">
+      <h2>Featured Products</h2>
+      <div id="featuredRow" class="row" aria-label="Featured products"></div>
+    </div>
+  </section>
+
+  <!-- New -->
+  <section class="section" id="newSection">
+    <div class="section-inner">
+      <h2>New Products</h2>
+      <div id="newRow" class="row" aria-label="New products"></div>
+    </div>
+  </section>
+
+  <!-- All Products -->
+  <section class="section">
+    <div class="section-inner">
+      <h2>All Products <span class="count" id="allCount"></span></h2>
+      <div id="grid" class="grid" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Category Drawer -->
+  <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="overlay" data-close></div>
+    <aside class="panel">
+      <button class="close-x" data-close aria-label="Close">✕</button>
+      <h3 id="drawerTitle">Browse Categories</h3>
+      <div id="drawerCats" class="cat-list"></div>
+    </aside>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="productModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="overlay" data-close></div>
+    <div class="panel">
+      <button class="close-abs" data-close aria-label="Close">✕</button>
+      <div class="content">
+        <div class="media"><img id="modalImg" alt=""></div>
+        <div class="modal-right">
+          <div class="details">
+            <h3 id="modalTitle" class="modal-title">Product</h3>
+            <div id="modalPrice" class="modal-price"></div>
+            <div id="modalDesc" class="modal-desc"></div>
+          </div>
+          <div class="content-buttons">
+            <div class="action-row" id="modalActions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © <span id="year"></span> Mimiflo. Baby care products you can trust.
+  </footer>
+
+  <script>
+  const CATEGORIES = [
+    "Accessories","Baby Carriers","Bathing and Grooming","Bottle Brushes","Breast Pumps",
+    "High Chairs","Cotton Buds","Diaper Bags","Drinking Cups","Feeding Bottles","Feeding",
+    "Hangers","Silicone Nipples","Silicone Pacifiers","Pack of 3's","Safety Harness",
+    "Sterilizers and Warmers","Storage","Teething Aid","Toothbrushes"
+  ];
+
+  const PRODUCTS = [
+    { id:"p1",  name:"3-in-1 Convertible High Chair", category:"High Chairs", featured:true, desc:"A high chair with a safety harness", img:"/images/demo/product-3-in-1-high-chair.webp", shopee:"#", lazada:"#", price:"₱3,499" },
+    { id:"p2",  name:"Steam Sterilizer with Dryer #787", category:"Sterilizers and Warmers", featured:true, desc:"Easy to operate with just a tap of a button, time-saving, and simple to clean", img:"/images/demo/product-steam-sterilizer-with-dryer.webp", shopee:"#", lazada:"#", price:"₱4,999" },
+    { id:"p3",  name:"10-in-1 Hipe Seat Carrier", category:"Sterilizers and Warmers", featured:true, desc:"Soft padded waist support that ensures comfort on both parent and child", img:"/images/demo/product-10-in-1-seat-carrier.webp", shopee:"#", lazada:"#", price:"₱2,299" },
+    { id:"p4",  name:"Classic Wide Neck Feeding Bottles - Tales of the Wild", category:"Feeding Bottles", new:true, desc:"Flexi-soft for baby's comfort, comfortable  latch for smooth feeding, and no nipple confusion", img:"/images/demo/product-wide-neck-feeding-bottle.webp", shopee:"#", lazada:"#", price:"₱399" },
+    { id:"p5",  name:"Classic Wide Neck Silicone Nipple by 2's", category:"Silicone Nipples", new:true, desc:"Made of 100% Pure liquid silicone which is easy to clean and long lasting.", img:"/images/demo/product-silicone-nipple.webp", shopee:"#", lazada:"#", price:"₱199" },
+    { id:"p6",  name:"1801 Wearable Breast Pump", category:"Breast Pumps", new:true, desc:"It is non-toxic, no Phthalates, and no Bisphenol A", img:"/images/demo/product-breast-pump.webp", shopee:"#", lazada:"#", price:"₱2,999" },
+    { id:"p7",  name:"Mimiflo 3-in-1 Bottle Brush Set", category:"Bottle Brushes", desc:"Nylon + sponge combo.", img:"/images/demo/product-3-in-1-brush.webp", shopee:"#", price:"₱149" },
+  ];
+
+  const SLIDES = [
+    {src:"/images/demo/slide1.webp", alt:"Mimiflo Double Electric Breast Pumps"},
+    {src:"/images/demo/slide2.webp", alt:"Mimiflo Wide Neck Feeding Bottles"},
+    {src:"/images/demo/slide3.webp", alt:"Mimiflo Wearable Electric Breast Pump"},
+    {src:"/images/demo/slide4.webp", alt:"See Mimiflo Products"},
+    {src:"/images/demo/slide5.webp", alt:"Mimiflo 8-in-1 Hipe Seat Carrier"},
+  ];
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => document.querySelectorAll(sel);
+  const escapeTxt = s => (s||"").toString().toLowerCase();
+  const byId = id => PRODUCTS.find(p=>p.id===id);
+
+  function templateCard(p){
+    const imageBlock = p.img
+      ? `<img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" width="600" height="600" />`
+      : `<div class="ph">IMG</div>`;
+    return `
+    <article class="card" data-id="${p.id}" data-category="${p.category}" tabindex="0" aria-label="${p.name}">
+      <div class="thumb" aria-hidden="true">
+        <div class="badges">
+          ${p.featured ? `<span class="badge">Featured</span>` : ``}
+          ${p.new ? `<span class="badge new">New</span>` : ``}
+        </div>
+        ${imageBlock}
+      </div>
+      <div class="body">
+        <div class="title">${p.name}</div>
+        ${p.price ? `<div class="price">${p.price}</div>` : ``}
+        <div class="cta">
+          ${p.shopee ? `<a class="pill shopee" href="${p.shopee}" target="_blank" rel="noopener">Shopee ↗</a>`:''}
+          ${p.lazada ? `<a class="pill lazada" href="${p.lazada}" target="_blank" rel="noopener">Lazada ↗</a>`:''}
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function renderFeatured(){ $("#featuredRow").innerHTML = PRODUCTS.filter(p=>p.featured).map(templateCard).join(""); }
+  function renderNew(){ $("#newRow").innerHTML = PRODUCTS.filter(p=>p.new).map(templateCard).join(""); }
+  function renderAll(list){
+    $("#grid").innerHTML = list.map(templateCard).join("");
+    $("#matchCount").textContent = list.length;
+    $("#allCount").textContent = `(${PRODUCTS.length} total)`;
+    wireCards();
+  }
+
+  function togglePromos(show){ $("#featuredSection").style.display = show ? "" : "none"; $("#newSection").style.display = show ? "" : "none"; }
+
+  function renderChips(){
+    const chips = $("#chips");
+    const top = ["All", ...CATEGORIES.slice(0, 10)];
+    chips.innerHTML = top.map((c,i)=>`<button class="chip ${i===0?'active':''}" data-chip="${c}">${c}</button>`).join("");
+    chips.addEventListener("click", (e)=>{
+      const b = e.target.closest(".chip"); if(!b) return;
+      $$("#chips .chip").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      const cat = b.dataset.chip;
+      $("#search").value = "";
+      if(cat==="All"){ renderAll(PRODUCTS); togglePromos(true); }
+      else { renderAll(PRODUCTS.filter(p=>p.category===cat)); togglePromos(false); }
+    });
+  }
+
+  function openDrawer(){ $("#drawer").classList.add("active"); togglePromos(false); }
+  function closeDrawer(){
+    $("#drawer").classList.remove("active");
+    const q = $("#search").value.trim();
+    const allActive = $$("#chips .chip")[0]?.classList.contains("active");
+    if(!q && allActive){ togglePromos(true); }
+  }
+  function renderDrawer(){
+    const counts = Object.fromEntries(CATEGORIES.map(c=>[c,0]));
+    PRODUCTS.forEach(p=>{ counts[p.category] = (counts[p.category]||0)+1; });
+    const list = Object.entries(counts).map(([c,n])=>(
+      `<button class="cat-item" data-cat="${c}">
+        <span>${c}</span><span>${n}</span>
+      </button>`
+    )).join("");
+    $("#drawerCats").innerHTML = `<button class="cat-item" data-cat="All"><span>All</span><span>${PRODUCTS.length}</span></button>` + list;
+    $("#drawerCats").addEventListener("click", (e)=>{
+      const btn = e.target.closest(".cat-item"); if(!btn) return;
+      const cat = btn.dataset.cat;
+      $("#search").value = "";
+      if(cat==="All"){ renderAll(PRODUCTS); togglePromos(true); }
+      else{ renderAll(PRODUCTS.filter(p=>p.category===cat)); togglePromos(false); }
+      closeDrawer();
+    });
+  }
+
+  function hookSearch(){
+    const input = $("#search");
+    input.addEventListener("input", ()=>{
+      const q = escapeTxt(input.value);
+      const isSearching = q.length > 0;
+      togglePromos(!isSearching);
+      const filtered = isSearching
+        ? PRODUCTS.filter(p=>{
+            const name = escapeTxt(p.name);
+            const cat = escapeTxt(p.category);
+            const desc = escapeTxt(p.desc||"");
+            return name.includes(q) || cat.includes(q) || desc.includes(q);
+          })
+        : PRODUCTS;
+      renderAll(filtered);
+      $$("#chips .chip").forEach((x,i)=>x.classList.toggle("active", !isSearching && i===0));
+    });
+  }
+
+  function initSlideshow(){
+    const slider   = document.getElementById("slideshow");   // NEW
+    const slidesEl = document.getElementById("slides");
+    const dotsEl   = document.getElementById("dots");
+    let idx = 0, timer;
+
+    slidesEl.innerHTML = SLIDES.map(s=>`<div class="slide"><img src="${s.src}" alt="${s.alt}"></div>`).join("");
+    dotsEl.innerHTML   = SLIDES.map((_,i)=>`<div class="dot ${i===0?'active':''}" data-i="${i}"></div>`).join("");
+    const n = SLIDES.length;
+
+    // NEW: pixel-based translate to avoid right-side cutoffs
+    const applyTransform = ()=>{
+      const w = Math.round(slider.getBoundingClientRect().width);
+      slidesEl.style.transform = `translate3d(-${idx * w}px, 0, 0)`;
+    };
+    window.addEventListener("orientationchange", ()=> setTimeout(applyTransform, 0));
+
+    const go = (i)=>{
+      idx = (i + n) % n;
+      applyTransform();
+      document.querySelectorAll("#dots .dot").forEach((d,di)=>d.classList.toggle("active", di===idx));
+      reset();
+    };
+    const next = ()=>go(idx+1);
+    const prev = ()=>go(idx-1);
+
+    document.getElementById("nextBtn").addEventListener("click", next);
+    document.getElementById("prevBtn").addEventListener("click", prev);
+    dotsEl.addEventListener("click", e=>{
+      const d = e.target.closest(".dot"); if(!d) return;
+      go(parseInt(d.dataset.i,10));
+    });
+
+    // Auto-advance
+    const reset = ()=>{ clearInterval(timer); timer = setInterval(next, 4000); };
+    reset();
+
+    // Touch swipe
+    let startX = null;
+    slidesEl.addEventListener("touchstart", e=>{ startX = e.touches[0].clientX; clearInterval(timer); }, {passive:true});
+    slidesEl.addEventListener("touchend", e=>{
+      if(startX===null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if(Math.abs(dx) > 40){ dx<0 ? next() : prev(); }
+      reset(); startX=null;
+    }, {passive:true});
+
+    // NEW: recalc position on resize/orientation changes
+    window.addEventListener("resize", applyTransform);
+
+    // Initial position
+    applyTransform();
+  }
+
+
+  /* Menu */
+  function initMenu(){
+    const btn = $("#pagesBtn");
+    const menu = $("#pagesMenu");
+    const toggle = ()=>{
+      const open = !menu.classList.contains("open");
+      menu.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", String(open));
+    };
+    btn.addEventListener("click", (e)=>{ e.stopPropagation(); toggle(); });
+    document.addEventListener("click", ()=>{ menu.classList.remove("open"); btn.setAttribute("aria-expanded","false"); });
+  }
+
+  /* Modal */
+  function openProductModal(p){
+    $("#modalTitle").textContent = p.name || "Product";
+    $("#modalPrice").textContent = p.price ? p.price : "";
+    $("#modalDesc").textContent = p.desc || "";
+    $("#modalImg").src = p.img || "";
+    $("#modalImg").alt = p.name || "Product";
+
+    const actions = [];
+    if(p.shopee) actions.push(`<a class="pill shopee" href="${p.shopee}" target="_blank" rel="noopener">Buy on Shopee ↗</a>`);
+    if(p.lazada) actions.push(`<a class="pill lazada" href="${p.lazada}" target="_blank" rel="noopener">Buy on Lazada ↗</a>`);
+    $("#modalActions").innerHTML = actions.join("");
+
+    $("#productModal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeProductModal(){
+    $("#productModal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function wireCards(){
+    ["#grid","#featuredRow","#newRow"].forEach(sel=>{
+      const el = document.querySelector(sel);
+      if(!el) return;
+      el.querySelectorAll(".card").forEach(card=>{
+        const open = ()=>{ const p = byId(card.dataset.id); if(p) openProductModal(p); };
+        card.addEventListener("click", open);
+        card.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" ") { e.preventDefault(); open(); }});
+      });
+    });
+  }
+  function initModal(){
+    $$("#productModal [data-close]").forEach(btn=>btn.addEventListener("click", closeProductModal));
+    $("#productModal").addEventListener("click", e=>{ if(e.target.classList.contains("overlay")) closeProductModal(); });
+    document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeProductModal(); });
+  }
+
+  (function init(){
+    document.getElementById("year").textContent = new Date().getFullYear();
+    renderFeatured(); renderNew(); renderAll(PRODUCTS);
+    renderChips(); renderDrawer(); hookSearch(); initSlideshow(); initMenu(); initModal();
+
+    $("#openCategories").addEventListener("click", openDrawer);
+    $("[data-close]").addEventListener("click", closeDrawer);
+    $("#drawer").addEventListener("click", (e)=>{ if(e.target.classList.contains("overlay")) closeDrawer(); });
+    document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeDrawer(); });
+  })();
+  </script>
+</body>
+</html>
