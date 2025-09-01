@@ -396,6 +396,9 @@
   </footer>
 
   <script>
+  /* -----------------------------
+     Data (your current lists)
+  ------------------------------ */
   const CATEGORIES = [
     "Accessories","Baby Carriers","Bathing and Grooming","Bottle Brushes","Breast Pumps",
     "High Chairs","Cotton Buds","Diaper Bags","Drinking Cups","Feeding Bottles","Feeding",
@@ -421,11 +424,20 @@
     {src:"/images/demo/slide5.webp", alt:"Mimiflo 8-in-1 Hipe Seat Carrier"},
   ];
 
-  const $ = sel => document.querySelector(sel);
+  /* -----------------------------
+     Helpers & State
+  ------------------------------ */
+  const $  = sel => document.querySelector(sel);
   const $$ = sel => document.querySelectorAll(sel);
   const escapeTxt = s => (s||"").toString().toLowerCase();
   const byId = id => PRODUCTS.find(p=>p.id===id);
 
+  // Active category shared by chips, drawer, and search
+  let ACTIVE_CAT = 'All';
+
+  /* -----------------------------
+     Templating & Rendering
+  ------------------------------ */
   function templateCard(p){
     const imageBlock = p.img
       ? `<img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" width="600" height="600" />`
@@ -450,77 +462,121 @@
     </article>`;
   }
 
-  function renderFeatured(){ $("#featuredRow").innerHTML = PRODUCTS.filter(p=>p.featured).map(templateCard).join(""); }
-  function renderNew(){ $("#newRow").innerHTML = PRODUCTS.filter(p=>p.new).map(templateCard).join(""); }
+  function renderFeatured(){
+    $("#featuredRow").innerHTML = PRODUCTS.filter(p=>p.featured).map(templateCard).join("");
+  }
+  function renderNew(){
+    $("#newRow").innerHTML = PRODUCTS.filter(p=>p.new).map(templateCard).join("");
+  }
   function renderAll(list){
     $("#grid").innerHTML = list.map(templateCard).join("");
     $("#matchCount").textContent = list.length;
     $("#allCount").textContent = `(${PRODUCTS.length} total)`;
-    wireCards();
+    wireCards(); // attach modal handlers
   }
 
-  function togglePromos(show){ $("#featuredSection").style.display = show ? "" : "none"; $("#newSection").style.display = show ? "" : "none"; }
+  function togglePromos(show){
+    $("#featuredSection").style.display = show ? "" : "none";
+    $("#newSection").style.display = show ? "" : "none";
+  }
+
+  /* -----------------------------
+     Chips (All + all categories)
+  ------------------------------ */
+  function setActiveChip(cat){
+    $$("#chips .chip").forEach(ch=>ch.classList.remove("active"));
+    const chip = $(`#chips .chip[data-chip="${cat}"]`) || $(`#chips .chip[data-chip="All"]`);
+    if(chip){ chip.classList.add("active"); chip.scrollIntoView?.({inline:'center', block:'nearest', behavior:'smooth'}); }
+  }
 
   function renderChips(){
     const chips = $("#chips");
-    const top = ["All", ...CATEGORIES.slice(0, 10)];
-    chips.innerHTML = top.map((c,i)=>`<button class="chip ${i===0?'active':''}" data-chip="${c}">${c}</button>`).join("");
+    const items = ["All", ...CATEGORIES];
+    chips.innerHTML = items.map(c=>`<button class="chip ${c==='All'?'active':''}" data-chip="${c}">${c}</button>`).join("");
+
     chips.addEventListener("click", (e)=>{
       const b = e.target.closest(".chip"); if(!b) return;
-      $$("#chips .chip").forEach(x=>x.classList.remove("active"));
-      b.classList.add("active");
-      const cat = b.dataset.chip;
-      $("#search").value = "";
-      if(cat==="All"){ renderAll(PRODUCTS); togglePromos(true); }
-      else { renderAll(PRODUCTS.filter(p=>p.category===cat)); togglePromos(false); }
+      ACTIVE_CAT = b.dataset.chip;
+      $("#search").value = ""; // clear search when changing category via chip
+      setActiveChip(ACTIVE_CAT);
+
+      const base = (ACTIVE_CAT === "All") ? PRODUCTS : PRODUCTS.filter(p=>p.category === ACTIVE_CAT);
+      renderAll(base);
+      togglePromos(ACTIVE_CAT === "All");
     });
   }
 
-  function openDrawer(){ $("#drawer").classList.add("active"); togglePromos(false); }
-  function closeDrawer(){
-    $("#drawer").classList.remove("active");
-    const q = $("#search").value.trim();
-    const allActive = $$("#chips .chip")[0]?.classList.contains("active");
-    if(!q && allActive){ togglePromos(true); }
+  /* -----------------------------
+     Drawer (linked to chips)
+  ------------------------------ */
+  function openDrawer(){
+    $("#drawer").classList.add("active");
+    // Hide promos as the user is about to filter
+    togglePromos(false);
   }
+  function closeDrawer(){ $("#drawer").classList.remove("active"); }
+
   function renderDrawer(){
     const counts = Object.fromEntries(CATEGORIES.map(c=>[c,0]));
     PRODUCTS.forEach(p=>{ counts[p.category] = (counts[p.category]||0)+1; });
+
     const list = Object.entries(counts).map(([c,n])=>(
       `<button class="cat-item" data-cat="${c}">
         <span>${c}</span><span>${n}</span>
       </button>`
     )).join("");
-    $("#drawerCats").innerHTML = `<button class="cat-item" data-cat="All"><span>All</span><span>${PRODUCTS.length}</span></button>` + list;
+
+    $("#drawerCats").innerHTML =
+      `<button class="cat-item" data-cat="All"><span>All</span><span>${PRODUCTS.length}</span></button>` + list;
+
     $("#drawerCats").addEventListener("click", (e)=>{
       const btn = e.target.closest(".cat-item"); if(!btn) return;
       const cat = btn.dataset.cat;
-      $("#search").value = "";
-      if(cat==="All"){ renderAll(PRODUCTS); togglePromos(true); }
-      else{ renderAll(PRODUCTS.filter(p=>p.category===cat)); togglePromos(false); }
+
+      ACTIVE_CAT = cat;
+      $("#search").value = "";        // clear search
+      setActiveChip(ACTIVE_CAT);      // sync chips
+
+      const base = (ACTIVE_CAT === "All") ? PRODUCTS : PRODUCTS.filter(p=>p.category === ACTIVE_CAT);
+      renderAll(base);
+      togglePromos(ACTIVE_CAT === "All");
+
       closeDrawer();
     });
   }
 
+  /* -----------------------------
+     Search (respects ACTIVE_CAT)
+  ------------------------------ */
   function hookSearch(){
     const input = $("#search");
     input.addEventListener("input", ()=>{
-      const q = escapeTxt(input.value);
+      const q = escapeTxt(input.value).trim();
       const isSearching = q.length > 0;
-      togglePromos(!isSearching);
+
+      const base = (ACTIVE_CAT === "All") ? PRODUCTS : PRODUCTS.filter(p=>p.category === ACTIVE_CAT);
       const filtered = isSearching
-        ? PRODUCTS.filter(p=>{
+        ? base.filter(p=>{
             const name = escapeTxt(p.name);
-            const cat = escapeTxt(p.category);
+            const cat  = escapeTxt(p.category);
             const desc = escapeTxt(p.desc||"");
             return name.includes(q) || cat.includes(q) || desc.includes(q);
           })
-        : PRODUCTS;
+        : base;
+
       renderAll(filtered);
-      $$("#chips .chip").forEach((x,i)=>x.classList.toggle("active", !isSearching && i===0));
+
+      // Show promos only if not searching and category is All
+      togglePromos(!isSearching && ACTIVE_CAT === "All");
+
+      // Keep chip highlight on ACTIVE_CAT
+      setActiveChip(ACTIVE_CAT);
     });
   }
 
+  /* -----------------------------
+     Slideshow (pixel-precise)
+  ------------------------------ */
   function initSlideshow(){
     const slider   = document.getElementById("slideshow");
     const slidesEl = document.getElementById("slides");
@@ -531,31 +587,30 @@
     dotsEl.innerHTML   = SLIDES.map((_,i)=>`<div class="dot ${i===0?'active':''}" data-i="${i}"></div>`).join("");
     const n = SLIDES.length;
 
-    // NEW: pixel-based translate to avoid right-side cutoffs
     const applyTransform = ()=>{
-      const w = Math.floor(slider.clientWidth);
+      const w = Math.floor(slider.clientWidth); // content width only
       slidesEl.style.transform = `translate3d(-${idx * w}px, 0, 0)`;
     };
     new ResizeObserver(applyTransform).observe(slider);
     window.addEventListener("orientationchange", ()=> setTimeout(applyTransform, 0));
+    window.addEventListener("resize", applyTransform);
 
     const go = (i)=>{
       idx = (i + n) % n;
       applyTransform();
-      document.querySelectorAll("#dots .dot").forEach((d,di)=>d.classList.toggle("active", di===idx));
+      $$("#dots .dot").forEach((d,di)=>d.classList.toggle("active", di===idx));
       reset();
     };
     const next = ()=>go(idx+1);
     const prev = ()=>go(idx-1);
 
-    document.getElementById("nextBtn").addEventListener("click", next);
-    document.getElementById("prevBtn").addEventListener("click", prev);
+    $("#nextBtn").addEventListener("click", next);
+    $("#prevBtn").addEventListener("click", prev);
     dotsEl.addEventListener("click", e=>{
       const d = e.target.closest(".dot"); if(!d) return;
       go(parseInt(d.dataset.i,10));
     });
 
-    // Auto-advance
     const reset = ()=>{ clearInterval(timer); timer = setInterval(next, 4000); };
     reset();
 
@@ -569,15 +624,12 @@
       reset(); startX=null;
     }, {passive:true});
 
-    // NEW: recalc position on resize/orientation changes
-    window.addEventListener("resize", applyTransform);
-
-    // Initial position
     applyTransform();
   }
 
-
-  /* Menu */
+  /* -----------------------------
+     Menu (hamburger)
+  ------------------------------ */
   function initMenu(){
     const btn = $("#pagesBtn");
     const menu = $("#pagesMenu");
@@ -590,7 +642,9 @@
     document.addEventListener("click", ()=>{ menu.classList.remove("open"); btn.setAttribute("aria-expanded","false"); });
   }
 
-  /* Modal */
+  /* -----------------------------
+     Modal (open/close)
+  ------------------------------ */
   function openProductModal(p){
     $("#modalTitle").textContent = p.name || "Product";
     $("#modalPrice").textContent = p.price ? p.price : "";
@@ -627,11 +681,19 @@
     document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeProductModal(); });
   }
 
+  /* -----------------------------
+     Init
+  ------------------------------ */
   (function init(){
-    document.getElementById("year").textContent = new Date().getFullYear();
-    renderFeatured(); renderNew(); renderAll(PRODUCTS);
-    renderChips(); renderDrawer(); hookSearch(); initSlideshow(); initMenu(); initModal();
+    $("#year").textContent = new Date().getFullYear();
 
+    // Initial renders
+    renderFeatured(); renderNew();
+    renderAll(PRODUCTS);                 // All products at start
+    renderChips(); renderDrawer();
+    hookSearch(); initSlideshow(); initMenu(); initModal();
+
+    // Drawer wiring
     $("#openCategories").addEventListener("click", openDrawer);
     $("[data-close]").addEventListener("click", closeDrawer);
     $("#drawer").addEventListener("click", (e)=>{ if(e.target.classList.contains("overlay")) closeDrawer(); });
