@@ -247,6 +247,18 @@ main {
     --glow-size: 50vw;
     --glow-color: rgba(78, 205, 196, 0.2);
   }
+  header nav {
+    padding: 0 1rem;
+  }
+
+  nav ul {
+    gap: 1rem;
+  }
+
+  nav ul li a {
+    font-size: 1rem;
+  }
+
   .projects-grid {
     margin-top: 0 !important;
     padding-top: 0 !important;
@@ -316,6 +328,7 @@ footer {
 @media (max-width: 768px) {
   .grid-container {
     grid-template-columns: 1fr;
+    padding: 0;
   }
 }
 
@@ -373,19 +386,14 @@ footer {
 }
 
 @media (max-width: 500px) {
+  .projects-grid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .project-card {
     text-align: center;
   }
-}
-
-/* hide cards from #3 onward */
-#featured-projects .project-card:nth-child(n + 3) {
-  display: none;
-}
-
-/* when .show-all is toggled, show everything */
-#featured-projects.show-all .project-card {
-  display: block;
 }
 
 @keyframes slideInFromLeft {

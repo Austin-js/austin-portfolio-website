@@ -84,15 +84,14 @@
           <div class="project-card">
             <img
               src="/images/projects/liquidity-sniper-bot.webp"
-              alt="Liquidity Sniper Bot"
+              alt="Ethereum transaction automation tools"
             />
-            <h3>
-              Uniswap/PancakeSwap (Ethereum Blockchain) Liquidity Sniper Bot
-            </h3>
+            <h3>Ethereum Blockchain Transaction Automation Tools</h3>
             <p>
-              This is a bot for the Ethereum blockchain that allows to buy a
-              token during launch as soon as liquidity is detected or if
-              swapping is enabled.
+              Built multiple automation tools for Ethereum blockchain
+              transactions, including token launch sniping, market-making
+              volume automation, wallet generation, and fund distribution
+              workflows.
             </p>
             <p>
               <a
@@ -105,60 +104,43 @@
 
           <div class="project-card">
             <img
-              src="/images/projects/volume-bot.webp"
-              alt="Uniswap Pancakeswap volume bot"
-            />
-            <h3>Ethereum Blockchain Volume Bot (Market Maker)</h3>
-            <p>
-              Increase your token's volume by using this tool that allows you to
-              automatically create buy and sell transactions for a period of
-              time.
-            </p>
-            <p>
-              <a
-                href="https://www.upwork.com/services/product/development-it-ethereum-blockchain-volume-bot-market-maker-1735874227995877376?ref=project_share"
-                target="_blank"
-                >View on Upwork</a
-              >
-            </p>
-          </div>
-
-          <div class="project-card">
-            <img
-              src="/images/projects/wallet-generator.webp"
-              alt="Ethereum Wallet Generator"
-            />
-            <h3>Ethereum Blockchain Wallet Generator</h3>
-            <p>
-              This bot allows you to generate as many wallets as you can. It is
-              also equipped with functions that allows you to send funds to and
-              from the generated wallets.
-            </p>
-            <p>
-              <a
-                href="https://www.upwork.com/services/product/development-it-ethereum-blockchain-wallet-generator-1735875893846855680?ref=project_share"
-                target="_blank"
-                >View on Upwork</a
-              >
-            </p>
-          </div>
-
-          <div class="project-card">
-            <img
               src="/images/projects/chat-bot-demo.png"
-              alt="Business Chatbot demo"
+              alt="AI chatbot and workflow automation demo"
             />
-            <h3>Facebook Page AI Chatbot</h3>
+            <h3>AI Chatbots and Workflow Automation Agents</h3>
             <p>
-              Can help with your customer inquiries, data collection, and even
-              bookings or orders!
+              Develop AI chatbots and AI agents that support customer
+              conversations, data collection, task routing, productivity
+              workflows, and business process automation.
             </p>
-            <p><a href="" target="_blank">(Work in progress)</a></p>
+          </div>
+
+          <div class="project-card">
+            <img
+              src="/images/projects/ForexSC.png"
+              alt="AI trading system research dashboard"
+            />
+            <h3>Disciplined AI Trading System Research</h3>
+            <p>
+              Currently developing and researching a disciplined AI trading
+              system that combines continuous reinforcement learning
+              experiments, market signal analysis, and smart risk management.
+            </p>
+          </div>
+
+          <div class="project-card">
+            <img
+              src="/images/projects/business-dashboard-automation.png"
+              alt="Business dashboard and workflow automation interface"
+            />
+            <h3>Business Dashboards and Data Workflow Automations</h3>
+            <p>
+              Build dashboards, workflow automations, and data management
+              systems that help businesses and organizations monitor operations,
+              organize records, and reduce repetitive manual work.
+            </p>
           </div>
         </div>
-        <button id="show-more-btn" class="btn btn-outline">
-          See More Projects
-        </button>
       </section>
     </main>
 
@@ -194,19 +176,6 @@
           const y = window.scrollY;
           leftGlow.style.transform = `translateY(${y * speed}px)`;
           rightGlow.style.transform = `translateY(${-y * speed}px)`;
-        });
-      });
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const grid = document.getElementById("featured-projects");
-        const btn = document.getElementById("show-more-btn");
-
-        btn.addEventListener("click", () => {
-          // reveal all cards
-          grid.classList.add("show-all");
-          // hide the button
-          btn.style.display = "none";
         });
       });
     </script>
